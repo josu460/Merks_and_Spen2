@@ -10,7 +10,7 @@ from reportlab.lib.pagesizes import letter
 import os
 
 class Articulo:
-    db_name = 'bd_merks.db'
+    db_name = 'DBMerksandSpend2.db'
     def __init__(self, ventana_articulo):
         
         self.conexion = Controlador()

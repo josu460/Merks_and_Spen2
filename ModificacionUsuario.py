@@ -1,21 +1,25 @@
 from tkinter import *
 from tkinter import simpledialog, messagebox
 from Controlador import *
+from tkinter import PhotoImage
 
 class ModificacionUsuario:
     def __init__(self, frame):
-        self.frame = frame #frame para la modificación de usuarios
-        self.objControlador = Controlador() #objeto de la clase Controlador
-        self.departamento = StringVar() #Variable para el nombre del departamento
-        self.modificarDepartamento = None #Variable para el Checkbutton
-        self.modificarContrasena = None     #Variable para el Checkbutton
-        self.modificarButton = None        #Variable para el botón de modificar
-        self.label_modificar = None       #Variable para el label de modificar
-        self.create_widgets() #Llamada al método create_widgets
+        self.frame = frame # frame para la modificación de usuarios
+        self.objControlador = Controlador() # objeto de la clase Controlador
+        self.departamento = StringVar() # Variable para el nombre del departamento
+        self.modificarDepartamento = None # Variable para el Checkbutton
+        self.modificarContrasena = None     # Variable para el Checkbutton
+        self.modificarButton = None        # Variable para el botón de modificar
+        self.label_modificar = None       # Variable para el label de modificar
+        self.image = PhotoImage(file="imagenes/editar.png") # Imagen para la modificación de usuarios
+        self.image = self.image.subsample(4, 4) # Tamaño de la imagen
+        self.create_widgets() # Llamada al método create_widgets
 
     def create_widgets(self):
         Label(self.frame, text="Modificación de usuarios", fg="blue", font=("modern", 18)).pack() 
-        Label(self.frame, text="Se buscará el departamento y se modificará la contraseña o el nombre del departamento", fg="black", font=("arial", 10)).pack()
+        Label(self.frame, image=self.image).pack()
+        Label(self.frame, text="Se buscará el departamento y se modificará la contraseña y/o el nombre del departamento", fg="black", font=("arial", 8)).pack()
 
         Label(self.frame, text="Nombre del departamento:").pack() 
         Entry(self.frame, textvariable=self.departamento).pack()
@@ -33,12 +37,12 @@ class ModificacionUsuario:
             self.update_modificaciones()
         else:
             messagebox.showinfo("Error", "El departamento no existe")
-            self.departamento.set("") #Limpia el campo de texto
-            self.hide_modificaciones() #Llamada al método hide_modificaciones
+            self.departamento.set("") # Limpia el campo de texto
+            self.hide_modificaciones() # Llamada al método hide_modificaciones
 
-    def hide_modificaciones(self): #Método para ocultar los widgets de modificación
-        if self.label_modificar: #Si el label de modificar existe
-            self.label_modificar.pack_forget() #Oculta el label de modificar
+    def hide_modificaciones(self): # Método para ocultar los widgets de modificación
+        if self.label_modificar: # Si el label de modificar existe
+            self.label_modificar.pack_forget() # Oculta el label de modificar
         if self.modificarDepartamento:
             self.check_modificarDepartamento.pack_forget()
         if self.modificarContrasena:

@@ -9,7 +9,7 @@ class Controlador:
     
     def conexion(self):
         try:
-            conex = sqlite3.connect("BDMerksandSpendall.db")
+            conex = sqlite3.connect("DBMerksandSpend2.db")
             
             print("Conectado")
             return conex
@@ -48,15 +48,14 @@ class Controlador:
             
     def desencriptar(self, password_plana, password_encriptada):
         try:
-            password_plana = password_plana.encode() #convertir la contraseña plana a bytes, la contraseña plana es la que el usuario ingresa
-            password_encriptada = password_encriptada.encode() #convertir la contraseña encriptada a bytes, la contraseña encriptada es la que se obtiene de la base de datos
+            password_plana = password_plana.encode() #convertir la contraseña plana a bytes, la contraseña plana es la que el usuario ingresó en el campo de texto
             if bcrypt.checkpw(password_plana, password_encriptada): #comparar la contraseña plana con la contraseña encriptada, checkpw devuelve True si son iguales
                 return True #si son iguales, la contraseña es correcta
             else: #si no son iguales, la contraseña es incorrecta
                 return False #si son diferentes, la contraseña es incorrecta
         except sqlite3.Error as error: #si hay un error al desencriptar
             print("Error al desencriptar", error) #imprimir el error
-            return False #la contraseña es incorrecta
+            return False #la contraseña es incorrecta
         
     def login(self, departamento, password_plana):
         departamentoNormalizado = self.normalizar(departamento)
@@ -78,46 +77,34 @@ class Controlador:
             print("Error al hacer login", error)
             return False
             
-    def registrar(self, departamento, password):
-        conexion = None
-        departamentoNormalizado = self.normalizar(departamento)
-        if departamentoNormalizado and password: #verificar que los campos no estén vacíos
-            try:
-                # verificar si el usuario ya existe
-                existing_user = self.buscar(departamentoNormalizado)
-                if existing_user:
-                    messagebox.showinfo("Error", "El usuario ya existe")
-                    return
-
-                conexion = self.conexion()
-                cursor = conexion.cursor()
-                conHash = self.encriptar(password)
-                datos = (departamentoNormalizado, conHash)
-                sqlInsert = "INSERT INTO tbUsuarios (departamento, password) VALUES (?, ?)"
-                cursor.execute(sqlInsert, datos)
-                conexion.commit()
-                messagebox.showinfo("Registro", "Registro exitoso del departamento: " + departamentoNormalizado)
-            except sqlite3.Error as error:
-                print("Error al registrar", error)
-            finally:
-                if conexion:
-                    conexion.close()
-        else:
-            messagebox.showinfo("Error", "Todos los campos son obligatorios")
+    def registrar(self, departamento, password, tipo_usuario):
+            conexion = None
+            departamentoNormalizado = self.normalizar(departamento)
+            tipo_usuario_normalizado = self.normalizar_tipo_usuario(tipo_usuario)
             
-    def buscar(self, departamento):
-        departamentoNormalizado = self.normalizar(departamento)
-        try:
-            conexion = self.conexion()
-            cursor = conexion.cursor()
-            sqlSelect = "SELECT * FROM tbUsuarios WHERE LOWER(departamento) = ?"
-            cursor.execute(sqlSelect, (departamentoNormalizado,))
-            usuario = cursor.fetchall()
-            conexion.close()
-            return usuario
-        except sqlite3.Error as error:
-            print("Error al buscar", error)
-            return None
+            if departamentoNormalizado and password and tipo_usuario_normalizado: #verificar que los campos no estén vacíos
+                try:
+                    # verificar si el usuario ya existe
+                    existing_user = self.buscar(departamentoNormalizado)
+                    if existing_user:
+                        messagebox.showinfo("Error", "El usuario ya existe")
+                        return
+
+                    conexion = self.conexion()
+                    cursor = conexion.cursor()
+                    conHash = self.encriptar(password)
+                    datos = (departamentoNormalizado, conHash, tipo_usuario_normalizado)
+                    sqlInsert = "INSERT INTO tbUsuarios (departamento, password, tipo_usuario) VALUES (?, ?, ?)"
+                    cursor.execute(sqlInsert, datos)
+                    conexion.commit()
+                    messagebox.showinfo("Registro", "Registro exitoso del departamento: " + departamentoNormalizado + "\nEl usuario tendra permisos de: " + tipo_usuario)
+                except sqlite3.Error as error:
+                    print("Error al registrar", error)
+                finally:
+                    if conexion:
+                        conexion.close()
+            else:
+                messagebox.showinfo("Error", "Todos los campos son obligatorios")
         
     def modificar(self, departamento, nuevo_departamento=None, nueva_password=None):
         departamentoNormalizado = self.normalizar(departamento)
@@ -164,19 +151,18 @@ class Controlador:
             messagebox.showinfo("Error", "El departamento no existe")
             
     def consultarUsuarios(self):
-        conexion = self.conexion()
-        try:
-            cursor = conexion.cursor()
-            sqlSelect = "SELECT departamento FROM tbUsuarios"
-            cursor.execute(sqlSelect)
-            usuarios = cursor.fetchall()
-            conexion.close()
-            usuarios = [usuario[0] for usuario in usuarios] #convertir la lista de tuplas en una lista de strings
-            return usuarios
-        except sqlite3.Error as error:
-            print("Error al consultar", error)
-            return None
-        
+            conexion = self.conexion()
+            try:
+                cursor = conexion.cursor()
+                sqlSelect = "SELECT departamento FROM tbUsuarios"
+                cursor.execute(sqlSelect)
+                usuarios = cursor.fetchall()
+                conexion.close()
+                usuarios = [usuario[0] for usuario in usuarios] #convertir la lista de tuplas en una lista de strings
+                return usuarios
+            except sqlite3.Error as error:
+                print("Error al consultar", error)
+                return None
     def ejecutar_consulta(self,conexion, query, parametros=()):
         try:
             cursor = conexion.cursor()
@@ -197,3 +183,30 @@ class Controlador:
         finally:
             if conexion:
                 conexion.close()
+
+    def normalizar_tipo_usuario(self, tipo_usuario): #metodo para normalizar el tipo de usuario a minúsculas
+            return tipo_usuario.lower() if tipo_usuario else tipo_usuario
+
+        
+    def tipo_usuario(self, departamento):
+        departamentoNormalizado = self.normalizar(departamento)
+        usuario = self.buscar(departamentoNormalizado)
+        if usuario:
+            tipo_usuario = usuario[0][3] #obtener el tipo de usuario de la base de datos
+            return tipo_usuario #retornar el tipo de usuario
+        else:
+            return None
+
+    def buscar(self, departamento):
+            departamentoNormalizado = self.normalizar(departamento)
+            try:
+                conexion = self.conexion()
+                cursor = conexion.cursor()
+                sqlSelect = "SELECT * FROM tbUsuarios WHERE LOWER(departamento) = ?"
+                cursor.execute(sqlSelect, (departamentoNormalizado,))
+                usuario = cursor.fetchall()
+                conexion.close()
+                return usuario
+            except sqlite3.Error as error:
+                print("Error al buscar", error)
+                return None
