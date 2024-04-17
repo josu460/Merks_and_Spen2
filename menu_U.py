@@ -1,6 +1,7 @@
 from tkinter import *
 from articulos_U import BuscadorArticulos
 from pedidos import Pedidos
+from usuarios_U import ModificacionUsuario_U
 
 class MenuUsuarios:
     def __init__(self):
@@ -29,7 +30,7 @@ class MenuUsuarios:
         self.imagen_usuario_label = Label(self.frame_inferior, bg="white", image=self.imagen_usuario)
         self.imagen_usuario_label.grid(row=0, column=0)
 
-        self.botonusuario = Button(self.frame_inferior, text="Usuarios", width=13, height=3, bg="#f77900", fg="white", font=("Arial", 15))
+        self.botonusuario = Button(self.frame_inferior, text="Usuarios", width=13, height=3, bg="#f77900", fg="white", font=("Arial", 15), command=self.abrir_usuario)
         self.botonusuario.grid(row=1, column=0)
 
         self.espacio = Label(self.frame_inferior, bg="white", width=40)
@@ -68,6 +69,14 @@ class MenuUsuarios:
         self.pedidos.title("Pedidos")
         pedidos = Pedidos(self.pedidos)
         pedidos.mostrar_interfaz()
+        
+    def abrir_usuario(self):
+        self.usuario = Toplevel(self.ventana)
+        self.usuario.title("Modificación de Usuarios")
+        modificacion_usuario = ModificacionUsuario_U(self.usuario)
+        modificacion_usuario.mostrar_interfaz()
+        
+
 
 # Para usar la clase MenuUsuarios:
 menu_usuarios = MenuUsuarios()
