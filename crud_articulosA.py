@@ -49,7 +49,7 @@ class Articulo:
         self.nombre.grid(row=1, column=1, padx=5, pady=8)
 
         Label(marco, text="Departamento:", font=("Comic Sans", 10, "bold")).grid(row=2, column=0, sticky='e', padx=5, pady=8)
-        self.combo_categoria = ttk.Combobox(marco, values=["Administrador", "Sistemas", "Tics"], width=22)
+        self.combo_categoria = ttk.Combobox(marco, values=["Almacén", "Compras", "Produccion","Logística","Recursos humanos"], width=22)
         self.combo_categoria.current(0)
         self.combo_categoria.grid(row=2, column=1, padx=5, pady=8)
 
