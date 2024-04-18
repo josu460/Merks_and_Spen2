@@ -33,10 +33,11 @@ class ModificacionUsuario_U:
             messagebox.showinfo("Error", "El campo está vacío")
             return
 
-        if self.objControlador.buscar(departamento):
-            self.update_modificaciones()
+        resultado, usuario_nombre = self.objControlador.login(departamento, "")  # Capturar el valor de usuario_nombre
+        if resultado:
+            self.update_modificaciones(usuario_nombre)  # Pasar usuario_nombre al método update_modificaciones
         else:
-            messagebox.showinfo("Error", "El departamento no existe")
+            messagebox.showinfo("Error", "Error al iniciar sesión")
             self.departamento.set("") # Limpia el campo de texto
             self.hide_modificaciones() # Llamada al método hide_modificaciones
 
@@ -50,7 +51,7 @@ class ModificacionUsuario_U:
         if self.modificarButton:
             self.modificarButton.pack_forget()
 
-    def update_modificaciones(self):
+    def update_modificaciones(self, usuario_nombre):  # Añadir usuario_nombre como parámetro
         self.hide_modificaciones()
 
         self.label_modificar = Label(self.frame, text="Selecciona lo que desees modificar: ", fg="black", font=("arial", 10))

@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Frame, Button, Entry, ttk, LabelFrame, messagebox
+from tkinter import Tk, Label, Frame, Button, Entry, Spinbox, ttk, LabelFrame, messagebox
 from PIL import Image, ImageTk
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -49,6 +49,12 @@ class Pedidos:
         self.codigo_nombre.focus()
         self.codigo_nombre.grid(row=0, column=3, padx=10, pady=5)
 
+        # Agregar Spinbox para seleccionar cantidad
+        self.label_cantidad = Label(self.frame_buscar_producto, text="Cantidad:", font=("Comic Sans", 10, "bold"))
+        self.label_cantidad.grid(row=0, column=4, padx=5, pady=5)
+        self.cantidad_spinbox = Spinbox(self.frame_buscar_producto, from_=1, to=10, width=5)
+        self.cantidad_spinbox.grid(row=0, column=5, padx=5, pady=5)
+
         # mostrar los resultados de la búsqueda
         self.tree = ttk.Treeview(ventana, height=13, columns=("columna1", "columna2", "columna3", "columna4", "columna5"))
         self.tree.heading("#0", text="Codigo", anchor="center")
@@ -69,18 +75,12 @@ class Pedidos:
         self.tree.heading("columna5", text="Descripcion", anchor="center")
         self.tree.pack()
 
-       
         label_espacio = Label(frame_buscador, text="", font=("Comic Sans", 10, "bold"))
         label_espacio.pack(side="left", padx=80)  
 
-       
         self.boton_buscar = Button(frame_buscador, text="BUSCAR", command=self.Buscar_articulos, height=2, width=20, bg="green", fg="white", font=("Comic Sans", 10, "bold"))
         self.boton_buscar.pack(side="left", padx=5, pady=8)
 
-      
-        # self.boton_generar_ticket = Button(frame_buscador, text="Generar Ticket", height=2, width=15, bg="blue", fg="white", font=("Comic Sans", 10, "bold"), command=self.pedir_articulo)
-        # self.boton_generar_ticket.pack(side="left", padx=5, pady=8)
-        
         self.boton_pedir = Button(frame_buscador, text="Pedir", height=2, width=15, bg="orange", fg="white", font=("Comic Sans", 10, "bold"), command=self.pedir_articulo)
         self.boton_pedir.pack(side="left", padx=5, pady=8)
 
@@ -124,18 +124,20 @@ class Pedidos:
         c = canvas.Canvas("ticket.pdf", pagesize=letter)
         
         # Escribir el contenido del ticket
-        c.drawString(100, 750, "Ticket de Compra")
+        c.drawString(100, 750, "Ticket de Pedido")
         c.drawString(100, 730, "--------------------------")
         y = 700
         for i, item_id in enumerate(elementos_seleccionados):
             articulo = self.tree.item(item_id)['values']
-            c.drawString(100, y, f"Artículo {i + 1}: {articulo[0]} - ${articulo[3]} - Cantidad: {articulo[2]} - Categoria: {articulo[1]} ")
+            # Obtener la cantidad seleccionada por el usuario
+            cantidad_seleccionada = self.cantidad_spinbox.get()
+            c.drawString(100, y, f"Artículo {i + 1}: {articulo[0]} - ${articulo[3]} - Cantidad: {cantidad_seleccionada} - Categoria: {articulo[1]} ")
             y -= 20
         
-       
         c.save()
         messagebox.showinfo("Ticket generado", "Se ha generado el ticket correctamente como 'ticket.pdf'")
         self.abrir_pdf()
+
 
     def abrir_pdf(self):
         filepath = os.path.abspath("ticket.pdf")
@@ -156,7 +158,7 @@ class Pedidos:
             nombre = articulo['text']
             valores = articulo['values']
             id = valores[0]  # ID del artículo
-            cantidad = valores[2]
+            cantidad = self.cantidad_spinbox.get() # Cantidad seleccionada
             # Agregar el artículo a la tabla de pedidos
             self.agregar_pedido(nombre, id, cantidad)
 

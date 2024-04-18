@@ -62,11 +62,11 @@ class Controlador:
         try:
             usuario = self.buscar(departamentoNormalizado)
             if usuario:
-                password_encriptada = usuario[0][1] #obtener la contraseña encriptada de la base de datos
-                #esto es posible porque el método buscar retorna una lista de tuplas, y cada tupla tiene dos elementos, el primero es el departamento y el segundo es la contraseña
-                if self.desencriptar(password_plana, password_encriptada): #comparar la contraseña plana con la contraseña encriptada
+                password_encriptada = usuario[0][1]
+                if self.desencriptar(password_plana, password_encriptada):
                     messagebox.showinfo("Login", "Login exitoso del departamento: " + departamentoNormalizado)
-                    return True
+                    usuario_nombre = usuario[0][1]  # Almacenar el tipo de usuario antes de retornar True
+                    return True, usuario_nombre
                 else:
                     messagebox.showinfo("Error", "Contraseña incorrecta")
                     return False
@@ -76,6 +76,7 @@ class Controlador:
         except sqlite3.Error as error:
             print("Error al hacer login", error)
             return False
+
             
     def registrar(self, departamento, password, tipo_usuario):
             conexion = None

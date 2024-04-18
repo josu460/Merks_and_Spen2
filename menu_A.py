@@ -2,6 +2,7 @@ from tkinter import *
 from noteBookAdmin import noteBookAdmin
 from crud_articulosA import Articulo
 from graficas_A import Graficas
+from pedidosA import ConsultarPedidos
 
 class MenuAdministrador:
     def __init__(self):
@@ -44,17 +45,29 @@ class MenuAdministrador:
         self.botonarticulo = Button(self.frame_inferior, text="Articulos", width=13, height=3, bg="#065535", fg="white", font=("Arial", 15),command=self.abrir_articulos)
         self.botonarticulo.grid(row=1, column=2)
 
-        self.espacio2 = Label(self.frame_inferior, bg="white", width=45, height=16)
-        self.espacio2.grid(row=2, column=0)
+        # self.espacio2 = Label(self.frame_inferior, bg="red", width=45, height=16)
+        # self.espacio2.grid(row=2, column=0)
 
         self.imagen_graficas = PhotoImage(file=r"C:\Users\josuu\OneDrive\Documentos\POO\merks_and_spen_2\imagenes\grafica.png")
         self.imagen_graficas = self.imagen_graficas.subsample(3)
         self.imagen_graficas_label = Label(self.frame_inferior, bg="white", image=self.imagen_graficas)
-        self.imagen_graficas_label.grid(row=2, column=1)
+        self.imagen_graficas_label.grid(row=2, column=0)
 
         self.botongraficas = Button(self.frame_inferior, text="Graficas", width=13, height=3, bg="#065535", fg="white", font=("Arial", 15),command=self.abrir_graficas)
-        self.botongraficas.grid(row=3, column=1)
-
+        self.botongraficas.grid(row=3, column=0)
+        
+        self.espacio2 = Label(self.frame_inferior, bg="white", width=45, height=16)
+        self.espacio2.grid(row=2, column=1)
+        
+        
+        self.imagen_pedidos = PhotoImage(file=r"C:\Users\josuu\OneDrive\Documentos\POO\merks_and_spen_2\imagenes\pedido.png")
+        self.imagen_pedidos = self.imagen_pedidos.subsample(3)
+        self.imagen_pedidos_label = Label(self.frame_inferior, bg="white", image=self.imagen_pedidos)
+        self.imagen_pedidos_label.grid(row=2, column=2)
+        
+        self.boton_pedidos = Button(self.frame_inferior, text="Pedidos", width=13, height=3, bg="#065535", fg="white", font=("Arial", 15),command=self.abrir_pedidos)
+        self.boton_pedidos.grid(row=3, column=2)
+        
         self.notebook_admin = None
         self.crud_articulos = None
 
@@ -75,6 +88,12 @@ class MenuAdministrador:
         self.graficas.title("Graficas")
         self.graficas= Graficas(self.graficas)
         self.graficas.mostrar_interfaz()
+        
+    def abrir_pedidos(self):
+        self.pedidos = Toplevel(self.ventana)
+        self.pedidos.title("Pedidos")
+        pedidos = ConsultarPedidos(self.pedidos)
+        pedidos.mostrar_interfaz()
         
 
 # Para usar la clase MenuAdministrador:
